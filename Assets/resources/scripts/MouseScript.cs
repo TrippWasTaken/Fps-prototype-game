@@ -29,7 +29,7 @@ public class MouseScript : MonoBehaviour
     }
 
     void MouseLook(){
-        //This whole script actuals controls the models head and not the mouse
+        //This whole func handles controls the models head and not the mouse
         float mouseX = Input.GetAxis("Mouse X") * mouseSens * Time.deltaTime * 200;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSens * Time.deltaTime * 200;
 
@@ -44,6 +44,7 @@ public class MouseScript : MonoBehaviour
         playerRotate.y += mouseX;
         headRotate.y += mouseX;
         headRotate.x -= mouseY;
+        headRotate.z = -90f;
 
         if (xAxisClamp > 60)
         {
@@ -60,12 +61,12 @@ public class MouseScript : MonoBehaviour
     }
 
     void CameraUpdate(){
-        //This script hands mouse look
+        //This func is for mouse look
         float mouseX = Input.GetAxis("Mouse X") * mouseSens * Time.deltaTime * 200;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSens * Time.deltaTime * 200;
         camX += mouseY;
         camY += mouseX;
-        camX = Mathf.Clamp(camX, -80, 80);
+        camX = Mathf.Clamp(camX, -60, 60);
 
         Quaternion localRotation = Quaternion.Euler(-camX, camY, 0f);
         transform.rotation = localRotation;

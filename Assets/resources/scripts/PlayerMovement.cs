@@ -2,99 +2,146 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+    public enum MoveState{
+        IDLE,
+        RUN,
+        STRAFE,
+        SPRINT,
+        WALK
+    }
 public class PlayerMovement : MonoBehaviour
 {
     public Animator animator;
     public CharacterController controller;
     float speed = 5f;
-    float gravity = -11f;
-
+    float gravity = -15f;
+    float maxSpeed = 0f;
     public Transform groundCheck;
     public float groundDist = 0.4f;
     public LayerMask groundMask;
     float sprintSpeed = 4f;
+    float accelSpeed = 2f;
     Vector3 velocity;
     bool isGrounded;
     bool isMoving = false;
     bool isBack = false;
+    bool isJumping = false;
+
+    MoveState moveState;
+
 
     void Update()
     {
-        BaseMoevement();
+        BaseMovement();
     }
 
-    void BaseMoevement(){
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
+    void BaseMovement(){
 
-        animator.SetBool("Backwards", isBack);
+
+        float x = Input.GetAxisRaw("Horizontal");
+        float z = Input.GetAxisRaw("Vertical");
+        Vector3 move = transform.right * x + transform.forward * z;
+
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDist, groundMask);
 
         if (isGrounded && velocity.y < 0)
         {
-            velocity.y = -2f;
-            animator.SetBool("Jump", false);
+            velocity.y = -4f;
         }
 
-        if(Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") > 0){
-            isMoving = true;
-            animator.SetBool("Run", true);
-        }
-        else
-        {
-            isMoving = false;
-            animator.SetBool("Run", false);
-        }
-
-        if(Input.GetAxis("Vertical") < 0){
-            isBack = true;
-        }
-        else
-        {
-            isBack = false;
-        }
-
-        Vector3 move = transform.right * x + transform.forward * z;
-        controller.Move(move * speed * Time.deltaTime);
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
+        // if(Input.GetAxis("Vertical") < 0){
+        //     isBack = true;
+        // }
+        // else
+        // {
+        //     isBack = false;
+        // }
 
         if(Input.GetButtonDown("Jump") && isGrounded)
         {
-            Jump();
-            animator.SetBool("Jump", true);
+            Jump(2f);
+            isJumping = true;
+        }
+        else if(Input.GetButtonDown("Jump") && !isGrounded && isJumping)
+        {
+            Jump(3f);
+            isJumping = false;
+
         }
 
-        if(Input.GetButtonDown("Sprint"))
+        if(Input.GetButton("Sprint") && moveState == MoveState.RUN && z == 1)
         {
-            print("Sprinting");
-            speed += sprintSpeed;
-            animator.SetBool("Sprint", true);
+            Sprint();
         }
-        else if (Input.GetButtonUp("Sprint"))
+        else if(Input.GetButton("Walk"))
         {
-            print("running");
-            speed -= sprintSpeed;
-            animator.SetBool("Sprint", false);
+            //Walk();
+        }
+        else if(z != 0){
+            Run();
+        }
+        else if (x != 0){
+            Strafe();
+        }
+        else
+        {
+            maxSpeed = 0f;
+            accelSpeed = 2f;
+            moveState = MoveState.IDLE;
+            
         }
 
-        if(Input.GetButtonDown("Walk"))
-        {
-            print("Walking");
-            speed -= 2.5f;
-            animator.SetBool("Walk", true);
-        }
-        else if (Input.GetButtonUp("Walk"))
-        {
-            print("running");
-            speed += 2.5f;
-            animator.SetBool("Walk", false);
-        }
+        //Base Movement/Gravity behaviors
+        controller.Move(move * speed * Time.deltaTime);
+        speed = Mathf.Lerp(speed, maxSpeed , accelSpeed * Time.deltaTime);
+
+        velocity.y += gravity * Time.deltaTime;
+        controller.Move(velocity * Time.deltaTime);
+
+
     }
 
-    void Jump(){
-        float JumpHeight = 2f;
+    void Jump(float JumpHeight){
         velocity.y = Mathf.Sqrt(JumpHeight * -2f * gravity);
+    }
+
+    void Run(){
+        maxSpeed = 5f;
+        accelSpeed = 50f;
+        moveState = MoveState.RUN;
+    }
+
+    void Sprint(){
+        maxSpeed = 10f;
+        accelSpeed = 50f;
+        moveState = MoveState.RUN;
+    }
+
+    void Walk(){
+        float SpeedMax = 0f;
+    }
+
+    void Wallrun(){
 
     }
+
+    void Strafe(){
+        maxSpeed = 4f;
+        accelSpeed = 100f;
+        moveState = MoveState.STRAFE;
+    }
+
+    void Crouch(){
+
+    }
+
+    void Slide(){
+        float SpeedModifier = 0f;
+        print("SLIDING BRO");
+    }
+
+    void Mantle(){
+
+    }
+
 }

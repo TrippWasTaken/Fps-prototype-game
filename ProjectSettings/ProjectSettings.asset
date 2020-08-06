@@ -647,7 +647,13 @@ PlayerSettings:
       daydreamIconForeground: {fileID: 0}
       daydreamIconBackground: {fileID: 0}
   cloudServicesEnabled:
+    Analytics: 1
+    Build: 0
+    Collab: 1
+    Game Performance: 0
+    Purchasing: 0
     UNet: 1
+    Unity Ads: 0
   luminIcon:
     m_Name: 
     m_ModelFolderPath: 
@@ -660,10 +666,10 @@ PlayerSettings:
     m_VersionCode: 1
     m_VersionName: 
   apiCompatibilityLevel: 6
-  cloudProjectId: 
+  cloudProjectId: a45592cf-248a-43e4-ab33-01da16bad3bc
   framebufferDepthMemorylessMode: 0
-  projectName: 
-  organizationId: 
+  projectName: Fps prototype game
+  organizationId: unity_leqzp604-fk3ow
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
   disableOldInputManagerSupport: 0
