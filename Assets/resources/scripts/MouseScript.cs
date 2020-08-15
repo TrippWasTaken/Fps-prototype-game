@@ -17,6 +17,7 @@ public class MouseScript : MonoBehaviour
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        playerHead.rotation = transform.rotation;
     }
 
     // Update is called once per frame
@@ -33,31 +34,30 @@ public class MouseScript : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X") * mouseSens * Time.deltaTime * 200;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSens * Time.deltaTime * 200;
 
-        xAxisClamp -= mouseY;
+        // xAxisClamp -= mouseY;
         
        //xRotation = Mathf.Clamp(xRotation, -90f, 75f);
         //transform.localRotation = Quaternion.Euler(xRotation, 0f, 90f);
         //playerBody.Rotate(Vector3.up * mouseX);
         Vector3 playerRotate = playerBody.transform.rotation.eulerAngles;
-        Vector3 headRotate = playerHead.transform.rotation.eulerAngles;
+        // Vector3 headRotate = playerHead.transform.rotation.eulerAngles;
 
         playerRotate.y += mouseX;
-        headRotate.y += mouseX;
-        headRotate.x -= mouseY;
-        headRotate.z = -90f;
+        // headRotate.y += mouseX;
+        // headRotate.x -= mouseY;
+        // headRotate.z = 0f;
+        Vector3 rotation = transform.rotation.eulerAngles;
+        print(rotation);
+        if (rotation.x < 90 && rotation.x > 68) {
+            rotation.x = 68;
+        } else if (rotation.x > 90 && rotation.x < 295) {
+            rotation.x = 295;
+        }
 
-        if (xAxisClamp > 60)
-        {
-            xAxisClamp = 60;
-            headRotate.x = 60;
-        }
-        else if(xAxisClamp < -60)
-        {
-            xAxisClamp = -60;
-            headRotate.x = 300;
-        }
+        // rotation.x = Mathf.Clamp(rotation.x, -65, 75);
         playerBody.rotation = Quaternion.Euler(playerRotate);
-        playerHead.rotation = Quaternion.Euler(headRotate);
+        // playerHead.rotation = Quaternion.Euler(headRotate);
+        playerHead.rotation = Quaternion.Euler(rotation);
     }
 
     void CameraUpdate(){
@@ -66,7 +66,7 @@ public class MouseScript : MonoBehaviour
         float mouseY = Input.GetAxis("Mouse Y") * mouseSens * Time.deltaTime * 200;
         camX += mouseY;
         camY += mouseX;
-        camX = Mathf.Clamp(camX, -60, 60);
+        camX = Mathf.Clamp(camX, -88, 88);
 
         Quaternion localRotation = Quaternion.Euler(-camX, camY, 0f);
         transform.rotation = localRotation;
