@@ -4,11 +4,13 @@ using UnityEngine;
 
 public enum MoveState
 {
+  EMPTY,
   IDLE,
-  WALK,
   RUN,
   STRAFE,
-  SPRINT
+  SPRINT,
+  CROUCH,
+  SLIDE
 }
 
 public class PlayerMovement : MonoBehaviour
@@ -69,46 +71,58 @@ public class PlayerMovement : MonoBehaviour
     float x = Input.GetAxisRaw("Horizontal");
     float z = Input.GetAxisRaw("Vertical");
 
-    animator.SetFloat("InputY", z);
-    animator.SetFloat("InputX", x);
+    animator.SetFloat("InputY", z, 1f, Time.deltaTime * 20f);
+    animator.SetFloat("InputX", x, 1f, Time.deltaTime * 20f);
     animator.SetFloat("Sprint", Input.GetAxisRaw("Sprint"));
+    animator.SetFloat("Crouch", Input.GetAxisRaw("Crouch"), 1f , Time.deltaTime * 10f);
+
     move = transform.right * x + transform.forward * z;
 
+    bool wasGrounded = isGrounded;
     isGrounded = Physics.CheckSphere(groundCheck.position, groundDist, groundMask);
 
     animator.SetBool("Grounded", isGrounded);
 
     if (isGrounded && velocity.y < 0)
     {
-      velocity.y = -4f;
+      velocity.y = gravity;
+    } else if (!isGrounded && velocity.y < 0 && wasGrounded) {
+      velocity.y = 0;
     }
 
     if (Input.GetButtonDown("Jump") && isGrounded)
     {
       Jump(2f);
       isJumping = true;
+      lastMove = move;
     }
     else if (Input.GetButtonDown("Jump") && !isGrounded && isJumping)
     {
       Jump(3f);
       isJumping = false;
+      lastMove = move;
     }
 
-    // Change acceleration to 1/100th of the current state while midair
+    // Change acceleration to 1/10th + 1/speed of the current state acceleration while midair
     if (!isGrounded) {
-      accelMod = 0.25f;
-      move = Vector3.Lerp(lastMove, move, 30f * accelMod * Time.deltaTime);
+      accelMod = Mathf.Clamp(0.1f + 1/speed, 0.1f, 0.2f);
+      move = Vector3.Lerp(lastMove, move, 16 * accelMod * Time.deltaTime);
     } 
-    else 
+    else if (moveState != MoveState.SLIDE)
     {
       accelMod = 1.0f;
-      if (Input.GetButton("Sprint") && (moveState == MoveState.RUN || moveState == MoveState.SPRINT) && z == 1 && !Input.GetButtonDown("Walk"))
+      if (Input.GetButton("Sprint") && (moveState == MoveState.RUN || moveState == MoveState.SPRINT) && z == 1 && moveState != MoveState.CROUCH)
       {
         Sprint();
+
+        if(Input.GetButtonDown("Slide"))
+        {
+          animator.Play("Slide");
+        }
       }
-      else if (Input.GetButton("Walk"))
+      else if(Input.GetAxisRaw("Crouch") == 1 )
       {
-        Walk();
+        Crouch();
       }
       else if (z != 0)
       {
@@ -126,7 +140,7 @@ public class PlayerMovement : MonoBehaviour
       }
     }
 
-    if((moveState == MoveState.RUN || moveState == MoveState.SPRINT || moveState == MoveState.STRAFE) && isGrounded)
+    if(moveState >= MoveState.RUN && isGrounded && z + x != 0)
     {
       animator.SetBool("Moving", true);
     }
@@ -134,7 +148,14 @@ public class PlayerMovement : MonoBehaviour
     {
       animator.SetBool("Moving", false);
     }
-
+    // if(animator.GetCurrentAnimatorStateInfo(0).IsName("Slide"))
+    // {
+    //    Slide();
+    // }
+    // else
+    // {
+    //   animator.SetBool("Slide", false);
+    // }
 
     //Base Movement/Gravity behaviors
     speed = Mathf.Lerp(speed, maxSpeed, accelSpeed * accelMod * Time.deltaTime);
@@ -142,6 +163,7 @@ public class PlayerMovement : MonoBehaviour
 
     velocity.y += gravity * Time.deltaTime;
     controller.Move(velocity * Time.deltaTime);
+    // rigidbody.AddForce(velocity * Time.deltaTime);
     lastMove = move;
   }
 
@@ -164,33 +186,28 @@ public class PlayerMovement : MonoBehaviour
     moveState = MoveState.SPRINT;
   }
 
-  void Walk()
-  {
-    maxSpeed = 2f;
-    accelSpeed = 75f;
-    moveState = MoveState.WALK;
-  }
-
   void Wallrun()
   {
 
   }
-
   void Strafe()
   {
     maxSpeed = 5f;
     accelSpeed = 100f;
     moveState = MoveState.STRAFE;
   }
-
   void Crouch()
   {
-
+    maxSpeed = 3f;
+    accelSpeed = 50f;
+    moveState = MoveState.CROUCH;
   }
-
-  void Slide()
+  
+  public void Slide()
   {
-
+    maxSpeed = 20f;
+    accelSpeed = 50f;
+    moveState = MoveState.SLIDE;
   }
 
   void Mantle()
@@ -198,4 +215,7 @@ public class PlayerMovement : MonoBehaviour
 
   }
 
+  public void EmptyState() {
+    moveState = MoveState.EMPTY;
+  }
 }

@@ -47,7 +47,6 @@ public class MouseScript : MonoBehaviour
         // headRotate.x -= mouseY;
         // headRotate.z = 0f;
         Vector3 rotation = transform.rotation.eulerAngles;
-        print(rotation);
         if (rotation.x < 90 && rotation.x > 68) {
             rotation.x = 68;
         } else if (rotation.x > 90 && rotation.x < 295) {

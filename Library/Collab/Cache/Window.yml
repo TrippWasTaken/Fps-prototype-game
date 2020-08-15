@@ -14,9 +14,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SimpleSelectedItems:
     m_Keys:
+    - Assets/Resources/Models/Animations/AnimController.controller
+    - Assets/Resources/Models/Animations/Running Slide.anim
+    - Assets/Resources/Models/Animations/ybot@Running Slide.fbx
+    - Assets/Resources/Prefabs.meta
+    - Assets/Resources/Prefabs/CharacterController.prefab
+    - Assets/Resources/Prefabs/CharacterController.prefab.meta
+    - Assets/Resources/Scripts/MouseScript.cs
+    - Assets/Resources/Scripts/MouseScript.cs.meta
     - Assets/Resources/Scripts/PlayerMovement.cs
+    - Assets/Resources/Scripts/PlayerMovement.cs.meta
+    - Assets/Scenes/DevScene.unity
+    - Assets/Thirdparty/Scripts.meta
+    - Assets/Thirdparty/Scripts/Ground.physicMaterial
+    - Assets/Thirdparty/Scripts/Ground.physicMaterial.meta
+    - Assets/Thirdparty/Scripts/MoveCamera.cs
+    - Assets/Thirdparty/Scripts/MoveCamera.cs.meta
+    - Assets/Thirdparty/Scripts/PlayerMove.cs
+    - Assets/Thirdparty/Scripts/PlayerMove.cs.meta
     - 
-    m_Values: 0101
+    m_Values: 01010101010101010101010101010101010101
   RevisionSummary: 
   ChangesSearchValue: 
   SelectedHistoryRevision: 
